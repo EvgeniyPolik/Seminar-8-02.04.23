@@ -23,3 +23,47 @@
 и достучаться до списка, который и нужно пополнять
 а потом сохранять все в файл
 """
+import json
+
+
+def load_from_file(filename):
+    try:
+        with open(filename, 'r', encoding='utf-8') as origin:
+            json_data = json.load(origin)
+    except FileNotFoundError:
+        json_data = {'orders': []}
+    return json_data
+
+
+def write_to_file(filename, data):
+    data_write = load_from_file(filename)
+    data_write['orders'].extend(data)
+    with open(filename, 'w', encoding='utf-8') as destination:
+        json.dump(data_write, destination, indent=4)
+
+
+orders = [
+    {
+        'item': 'Carrow',
+        'quantity': 10,
+        'price': 15.5,
+        'buyer': 'Petr Markov',
+        'date': '04.04.2023'
+    },
+    {
+        'item': 'Tomato',
+        'quantity': 1,
+        'price': 10.0,
+        'buyer': 'Mark Petrow',
+        'date': '03.04.2023'
+    },
+    {
+        'item': 'Potato',
+        'quantity': 5,
+        'price': 50.0,
+        'buyer': 'Petr Vasilev',
+        'date': '02.04.2023'
+    }
+]
+
+write_to_file('orders.json', orders)

@@ -39,3 +39,44 @@ os_code_list, os_type_list. В этой же функции создать гл�
 os_prod_reg = re.compile(r'Изготовитель системы:\s*\S*')
 os_prod_list.append(os_prod_reg.findall(data)[0].split()[2])
 """
+import os
+import re
+import fnmatch
+import csv
+
+
+def get_catalog_files(mask):  # Получить список файлов по маске
+    files_in_dir = os.listdir('.')
+    list_files = []
+    for file in files_in_dir:
+        if fnmatch.fnmatch(file, mask):
+            list_files.append(file)  # Добавление удовлетворяющегг условию файла в список
+    return list_files
+
+
+def get_info(mask, headers):
+    list_files = get_catalog_files(mask)
+    result_data = [headers]
+    number_file = 1
+    for file in list_files:
+        result_line = [str(number_file)]
+        with open(file, 'r') as active_file:
+            data_from_file = active_file.read()
+        for item in headers:
+            os_prod_reg = re.compile(rf'{item}:\s*\S*')
+            result_line.append(os_prod_reg.findall(data_from_file)[0].split()[2])
+        result_data.append(result_line)
+        number_file += 1
+    return result_data
+
+
+def build_report_to_csv(mask, headers, file_name):
+    report_data = get_info(mask, headers)
+    with open(file_name, 'w', encoding='utf-8', newline='') as report:
+        file_writer = csv.writer(report)
+        file_writer.writerows(report_data)
+
+
+pattern = 'info_*.txt'
+headers_report = ['Изготовитель системы', 'Название ОС', 'Код продукта', 'Тип системы']
+build_report_to_csv(pattern, headers_report, 'data_report.csv')
